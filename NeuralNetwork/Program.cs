@@ -289,7 +289,26 @@ namespace NeuralNetwork
 
         public static void Main(string[] args)
         {
-            bool train = args.Length == 0 || args[0] != "--readonly";
+            bool train = false;
+            float breakThreshold = -1f;
+
+            var miscArgs = new List<string>();
+            for (int i = 0; i < args.Length; i++)
+            {
+                string argument = args[i];
+                switch (argument)
+                {
+                    case "--train":
+                        train = true;
+                        break;
+                    case "--break-threshold":
+                        breakThreshold = float.Parse(args[++i]);
+                        break;
+                    default:
+                        miscArgs.Add(argument);
+                        break;
+                }
+            }
 
             var serializer = JsonSerializer.Create(new JsonSerializerSettings
             {
@@ -321,11 +340,20 @@ namespace NeuralNetwork
                 throw new ArgumentException("Image/label count mismatch!");
             }
 
-            Network network;
-            const string networkFileName = "network.json";
-            if (File.Exists(networkFileName))
+            string networkPath;
+            if (miscArgs.Count > 0)
             {
-                using var stream = new FileStream(networkFileName, FileMode.Open, FileAccess.Read);
+                networkPath = miscArgs[0];
+            }
+            else
+            {
+                networkPath = "network.json";
+            }
+
+            Network network;
+            if (File.Exists(networkPath))
+            {
+                using var stream = new FileStream(networkPath, FileMode.Open, FileAccess.Read);
                 using var reader = new StreamReader(stream, Encoding.UTF8, leaveOpen: true);
                 using var jsonReader = new JsonTextReader(reader)
                 {
@@ -415,15 +443,13 @@ namespace NeuralNetwork
                             };
                         }
 
-
-                        const float breakThreshold = 0.025f;
                         lock (network)
                         {
                             Console.WriteLine($"Training network on batch {i + 1}...");
                             network.TrainOnBatch(batch, 0.1f, out float averageAbsoluteCost);
 
                             Console.WriteLine($"Average absolute cost: {averageAbsoluteCost}");
-                            if (averageAbsoluteCost <= breakThreshold)
+                            if (averageAbsoluteCost < breakThreshold)
                             {
                                 Console.WriteLine($"Average is less than {breakThreshold} - breaking");
 

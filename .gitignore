@@ -4,5 +4,4 @@ bin/
 .vscode/
 
 data/
-network.json
 results.json
