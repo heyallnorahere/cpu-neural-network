@@ -11,7 +11,7 @@ dotnet --info
 CONFIG=Release
 dotnet build -c $CONFIG
 
-# running
+# run
 dotnet NeuralNetwork/bin/$CONFIG/net7.0/NeuralNetwork.dll ...
 ```
 
