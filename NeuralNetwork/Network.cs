@@ -135,11 +135,11 @@ namespace NeuralNetwork
                 var layerActivations = new float[layerSize];
                 var layerZ = new float[layerSize];
 
-                var composited = Program.Composite(layer.Weights, previousActivations);
+                var composited = MathUtilities.Composite(layer.Weights, previousActivations);
                 for (int k = 0; k < layerSize; k++)
                 {
                     float neuronZ = layerZ[k] = composited[k] + layer.Biases[k];
-                    layerActivations[k] = Program.Sigmoid(neuronZ);
+                    layerActivations[k] = MathUtilities.Sigmoid(neuronZ);
                 }
 
                 activations[j + 1] = layerActivations;
@@ -162,27 +162,27 @@ namespace NeuralNetwork
             {
                 float activation = activations[^1][i];
                 float zValue = z[^1][i];
-                delta[i] = Program.CostDerivative(activation, expected[i]) * Program.SigmoidPrime(zValue);
+                delta[i] = MathUtilities.CostDerivative(activation, expected[i]) * MathUtilities.SigmoidPrime(zValue);
             }
 
             deltas[^1] = new Layer
             {
                 Biases = delta,
-                Weights = Program.Composite(delta, Program.Transpose(activations[^2]))
+                Weights = MathUtilities.Composite(delta, MathUtilities.Transpose(activations[^2]))
             };
 
             for (int i = 2; i <= deltas.Length; i++)
             {
-                delta = Program.Composite(Program.Transpose(mLayers[^(i-1)].Weights), delta);
+                delta = MathUtilities.Composite(MathUtilities.Transpose(mLayers[^(i-1)].Weights), delta);
                 for (int j = 0; j < delta.Length; j++)
                 {
-                    delta[j] *= Program.SigmoidPrime(z[^i][j]);
+                    delta[j] *= MathUtilities.SigmoidPrime(z[^i][j]);
                 }
 
                 deltas[^i] = new Layer
                 {
                     Biases = delta,
-                    Weights = Program.Composite(delta, Program.Transpose(activations[^(i+1)]))
+                    Weights = MathUtilities.Composite(delta, MathUtilities.Transpose(activations[^(i+1)]))
                 };
             }
         }
@@ -200,7 +200,7 @@ namespace NeuralNetwork
                 
                 for (int j = 0; j < mLayerSizes[^1]; j++)
                 {
-                    float cost = Program.Cost(activations[^1][j], pass.ExpectedOutput[j]);
+                    float cost = MathUtilities.Cost(activations[^1][j], pass.ExpectedOutput[j]);
                     averageAbsoluteCost += MathF.Abs(cost);
                 }
 
