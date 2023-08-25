@@ -1,0 +1,8 @@
+obj/
+bin/
+.vs/
+.vscode/
+
+data/
+network.json
+results.json
