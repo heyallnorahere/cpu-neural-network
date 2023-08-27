@@ -30,14 +30,18 @@ namespace NeuralNetwork
 
     internal static class Program
     {
+        private static readonly Random sRNG;
+        static Program()
+        {
+            sRNG = new Random();
+        }
+
         public static void Shuffle<T>(this T[] array)
         {
             int n = array.Length;
-            var random = new Random();
-
             while (n > 1)
             {
-                int i = random.Next(n--);
+                int i = sRNG.Next(n--);
                 (array[i], array[n]) = (array[n], array[i]);
             }
         }
